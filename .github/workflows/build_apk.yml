@@ -28,7 +28,16 @@ jobs:
       - name: Build APK
         run: flutter build apk --release
 
-      # 5️⃣ Create GitHub Release and upload APK
+      # 5️⃣ Create Git tag if none exists
+      - name: Create Git tag
+        run: |
+          TAG_NAME=v1-${GITHUB_RUN_NUMBER}
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag $TAG_NAME
+          git push origin $TAG_NAME
+
+      # 6️⃣ Create Release and upload APK
       - name: Create Release and upload APK
         uses: softprops/action-gh-release@v1
         with:
