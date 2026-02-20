@@ -1,4 +1,4 @@
-name: Build APK
+name: Build and Release APK
 
 on:
   push:
@@ -6,20 +6,32 @@ on:
       - main
 
 jobs:
-  build:
+  build-release:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # 2️⃣ Setup Flutter
       - name: Setup Flutter
         uses: subosito/flutter-action@v2.10.0
         with:
           flutter-version: '3.13.0'
 
+      # 3️⃣ Get dependencies
       - name: Get dependencies
         run: flutter pub get
 
+      # 4️⃣ Build APK (release mode)
       - name: Build APK
         run: flutter build apk --release
+
+      # 5️⃣ Create GitHub Release and upload APK
+      - name: Create Release and upload APK
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/app/outputs/flutter-apk/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
