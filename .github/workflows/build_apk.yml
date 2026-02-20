@@ -1,4 +1,4 @@
-name: Build and Release APK
+name: Build Flutter APK
 
 on:
   push:
@@ -7,41 +7,31 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-release:
+  build:
+    name: Build APK
     runs-on: ubuntu-latest
 
     steps:
       # 1️⃣ Checkout repository
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      # 2️⃣ Setup Flutter
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2.10.0
+      # 2️⃣ Install Flutter
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.13.0'
 
       # 3️⃣ Get dependencies
-      - name: Get dependencies
+      - name: Install dependencies
         run: flutter pub get
 
       # 4️⃣ Build APK
       - name: Build APK
         run: flutter build apk --release
 
-      # 5️⃣ Create Git tag if none exists
-      - name: Create Git tag
-        run: |
-          TAG_NAME=v1-${GITHUB_RUN_NUMBER}
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git tag $TAG_NAME
-          git push origin $TAG_NAME
-
-      # 6️⃣ Create Release and upload APK
-      - name: Create Release and upload APK
-        uses: softprops/action-gh-release@v1
+      # 5️⃣ Upload APK artifact (زر تحميل في الـ Actions فقط)
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
         with:
-          files: build/app/outputs/flutter-apk/app-release.apk
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: app-release.apk
+          path: build/app/outputs/flutter-apk/app-release.apk
